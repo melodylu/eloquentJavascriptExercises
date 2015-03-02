@@ -1,3 +1,4 @@
+// eloquentjavascript.net/04_data.html
 function deepEqual (thing1, thing2) {
   if ( (typeof thing1 == "object" && thing1 != null) && 
       (typeof thing2 == "object" && thing2 != null)) 
