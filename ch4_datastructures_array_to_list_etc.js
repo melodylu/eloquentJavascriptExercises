@@ -1,4 +1,7 @@
+// eloquentjavascript.net/04_data.html
+
 // adds the element to the front of the list
+
 function prepend(element, list) {
   var prependedList = {value: element, rest: list};
   return prependedList;
