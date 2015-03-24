@@ -1,210 +1,153 @@
-// http://eloquentjavascript.net/05_higher_order.html
-// example data: http://eloquentjavascript.net/code/ancestry.js
+// http://eloquentjavascript.net/06_object.html
 
+/*
+My questions: 
+- I'm not entirely sure why Object.prototype methods need to be inside or outside of the construction function.
 
-/* Flattening
-
-Use the reduce method in combination with the concat method to “flatten” an array of arrays into a single array that has all the elements of the input arrays. */
-
-
-var arrays = [[1, 2, 3], [4, 5], [6]];
-
-console.log(arrays.reduce(function (a, b) {
-  var flat = a.concat(b);
-  return flat;
-}));
-
-// Your code here.
-// → [1, 2, 3, 4, 5, 6]
-
-
-
-
-
-
-/* Mother-child age difference
-
-Using the example data set from this chapter, compute the average age difference between mothers and children (the age of the mother when the child is born). You can use the average function defined earlier in this chapter.
-
-Note that not all the mothers mentioned in the data are themselves present in the array. The byName object, which makes it easy to find a person’s object from their name, might be useful here.
+- I'm really not sure why, in the second exorcise "Stretch Cell", there is lots of 
+this.inner = inner;
+this.width = width;
+this.height = height;
 */
 
-function average(array) {
-  function plus(a, b) { return a + b; }
-  return array.reduce(plus) / array.length;
-}
 
-//find a person's object by name
-var byName = {};
-ancestry.forEach(function(person) {
-  byName[person.name] = person;
-});
+/* Exercise 1
+A vector type
 
-// ....mine:
-var mothers = [];
+Write a constructor Vector that represents a vector in two-dimensional space. It takes x and y parameters (numbers), which it should save to properties of the same name.
 
-// person has a mother who is in the data, therefore has a p.m.born
-function hasMum(p) { 
-  if (byName[p.mother])
-    return p;
-    else
-      return false;
-}
+Give the Vector prototype two methods, plus and minus, that take another vector as a parameter and return a new vector that has the sum or difference of the two vectors’ (the one in this and the parameter) x and y values.
 
-// this is the new ancestry object, filtered: kidWithMum
-var kidWithMum = ancestry.filter(hasMum);
+Add a getter property length to the prototype that computes the length of the vector—that is, the distance of the point (x, y) from the origin (0, 0).
+*/
 
-// get mother's birthdate by person from byName
-function motherBorn (person) {
-  var motherBorn = byName[person.mother].born;
-  var motherAge = person.born - motherBorn;
-  return motherAge;
+function Vector (x,y){
+  this.x = x;
+  this.y = y;
+  
+Vector.prototype.plus =  function  (vector) {
+    var summedVector = {};
+    summedVector.x = x+vector.x;
+    summedVector.y = y+vector.y;
+    return summedVector;
+  };
+  
+Vector.prototype.minus = function (vector) {
+    var subtractedVector = {};
+    subtractedVector.x = x-vector.x;
+    subtractedVector.y = y-vector.y;
+    return subtractedVector;
+  };                 
 };
 
-/*
-// a test to prove that this format works to call data
-console.log(byName[kidWithMum[9].mother].born);
-console.log(kidWithMum[9].mother);
-console.log(byName["Livina Haverbeke"].born);
-*/
-
-// the actual answer
-console.log((average(kidWithMum.map(motherBorn))).toFixed(1));
-
-// → 31.2
-
-/* My logic behind what I'm doing:
-data(p): people with mothers who exist
-average( array: [(m.born)- p.born ])
-
-make this function:
-m.born: {
-    forEach (p.mother)
-       return (mother.born)
-}
-
-Dan: Do this using forEach, somehow? 
-*/
-
-// this function will add the information to kidWithMum
-kidWithMum.forEach(function (person) {
-    // this works console.log(byName[person.mother].born);
-	person.momBorn = byName[person.mother].born;
-    // this works... console.log(person.momAge);
-	person.momAge = person.born - person.momBorn;
-	});
-
-// now you could just do the average thing
-//console.log(average(kidWithMum.forEach(function (p) {return p.momBorn;})).toFixed(2));
-var momAgeArray = [];
-kidWithMum.forEach(function (person) {momAgeArray.push(person.born - person.momBorn);});
-console.log((average(momAgeArray)).toFixed(1));
-
-
-
-
-
-/*
-Historical life expectancy
-
-When we looked up all the people in our data set that lived more than 90 years, only the latest generation in the data came out. Let’s take a closer look at that phenomenon.
-
-Compute and output the average age of the people in the ancestry data set per century. A person is assigned to a century by taking their year of death, dividing it by 100, and rounding it up, as in Math.ceil(person.died / 100).
-*/
-
-function average(array) {
-  function plus(a, b) { return a + b; }
-  return array.reduce(plus) / array.length;
-}
-
-/* 
-1  give people a century
-2  gathering people by person.century into an object of lists
-       Ages in cent = { 16: [44, 34, 78, etc], 17: [44, 34, 78, etc]}
-3  run average() on the centurios and print them out with labels
-*/
-
-// this function will add century to each person in ancestry{}
-ancestry.forEach(function (person) {
-	person.century = Math.ceil(person.died / 100);
-    person.age = person.died - person.born;
-	//print centuries console.log(person.century);
+Object.defineProperty(Vector.prototype, "length", {
+  get: function () {
+    return Math.sqrt(this.x*this.x + this.y*this.y);}
 });
 
-// create object full of arrays of ages, keyed by century
-var agesByCent = {};
-ancestry.forEach(function (person){
-   //if it doesn't have that century, add it
-   if (!agesByCent[person.century])
-     agesByCent[person.century] = [person.age];
-  else
-   agesByCent[person.century].push(person.age);
-});
+console.log(new Vector(1, 2).plus(new Vector(2, 3)));
+// → Vector{x: 3, y: 5}
+console.log(new Vector(1, 2).minus(new Vector(2, 3)));
+// → Vector{x: -1, y: -1}
+console.log(new Vector(3, 4).length);
+// → 5
 
-//console.log(agesByCent);
-/* 
+
+
+
+/* Exercise 2
+Another cell
+
+Implement a cell type named StretchCell(inner, width, height) that conforms to the table cell interface described earlier in the chapter. It should wrap another cell (like UnderlinedCell does) and ensure that the resulting cell has at least the given width and height, even if the inner cell would naturally be smaller.
+
+Their answer:
+http://eloquentjavascript.net/code/#6.2
 */
-// for cent in agesByCent, average agesByCent[i] and console.log it
 
-for (var age in agesByCent)
-  console.log(age+": "+average(agesByCent[age]).toFixed(1)+"\n");
 // Your code here.
+function StretchCell (inner, width, height) {
+  this.inner = inner;
 
-// → 16: 43.5
-//   17: 51.2
-//   18: 52.8
-//   19: 54.8
-//   20: 84.7
-//   21: 94
+StretchCell.prototype.minWidth = function () {
+  if (this.inner.minWidth() > width)
+    return this.inner.minWidth();
+  else 
+    return width;
+};
+  
+StretchCell.prototype.minHeight = function () {
+    if (this.inner.minHeight() > height)
+    return this.inner.minHeight();
+  else 
+    return height;
+};
+  
+  StretchCell.prototype.draw = function (width, height) {
+    return this.inner.draw(width, height);
+  };
+};
+
+var sc = new StretchCell(new TextCell("abc"), 1, 2);
+console.log(sc.minWidth());
+// → 3
+console.log(sc.minHeight());
+// → 2
+console.log(sc.draw(3, 2));
+// → ["abc", "   "]
 
 
 
 
 
+/* Exercise 3
+Sequence interface
 
+Design an interface that abstracts iteration over a collection of values. An object that provides this interface represents a sequence, and the interface must somehow make it possible for code that uses such an object to iterate over the sequence, looking at the element values it is made up of and having some way to find out when the end of the sequence is reached.
 
+When you have specified your interface, try to write a function logFive that takes a sequence object and calls console.log on its first five elements—or fewer, if the sequence has fewer than five elements.
+
+Then implement an object type ArraySeq that wraps an array and allows iteration over the array using the interface you designed. Implement another object type RangeSeq that iterates over a range of integers (taking from and to arguments to its constructor) instead.
+*/
 
 
 // Your code here.
-// every(array, function test)
+/*
+elementAt()
+lastElementIs()
+function RangeSeq (from, to) {
+}
+*/
+function elementAt(num){
+  
+}
 
-var tester = [3, NaN, NaN, NaN];
+function lastElementIs(){
+}
 
-// actual method on arrays
-//console.log(tester.some(isNaN));
-
-// my function to build the every method
-//console.log(every(tester,isNaN));
-function every (array, test) {
-  var stuff = true;
-  for (var i = 0; i < array.length; i++) {
-    if (!test(array[i])){
-      stuff = false;}
+function logFive (seq){
+  for (var i = 0; i < 5; i++) {
+    if (seq[i] !== undefined)
+    console.log(seq[i]);
   };
-   return stuff;
-  };
-
-// my function to build the some method
-console.log(every(tester,isNaN));
-function some (array, test) {
-  var stuff = false;
-  for (var i = 0; i < array.length; i++) {
-    if (test(array[i])){
-      stuff = true;
-       return stuff;
-    }
-  };
-   return stuff;
-  };
+}
 
 
+function ArraySeq (array) {
+  
+}
 
 
-console.log(every([NaN, NaN, NaN], isNaN));
-// → true
-console.log(every([NaN, NaN, 4], isNaN));
-// → false
-console.log(some([NaN, 3, 4], isNaN));
-// → true
-console.log(some([2, 3, 4], isNaN));
-// → false
+var tester = [2, 3, 4,];
+logFive(tester);
+/*
+// check answers
+logFive(new ArraySeq([1, 2]));
+// → 1
+// → 2
+logFive(new RangeSeq(100, 1000));
+// → 100
+// → 101
+// → 102
+// → 103
+// → 104
+*/
